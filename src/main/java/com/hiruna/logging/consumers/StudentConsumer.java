@@ -15,18 +15,18 @@ import java.util.Date;
 @Component
 public class StudentConsumer {
 
-    @KafkaListener(topics = "student-events", groupId = "student-event-group1")
+    @KafkaListener(topics = "student-events", groupId = "student-event-group1", containerFactory = "kafkaListenerContainerFactory")
     public void studentEventListener(Student std, @Header(KafkaHeaders.RECEIVED_KEY) String key) throws IOException {
         Date date = new Date();
         String log = switch (key) {
-            case "StudentRetrieved" -> "[%s] [%s][%d] was retrieved at [%tc]%n";
-            case "StudentCreated" -> "[%s] [%s][%d] was created at [%tc]%n";
-            case "StudentUpdated" -> "[%s] [%s][%d] was updated at [%tc]%n";
-            case "StudentDeleted" -> "[%s] [%s][%d] was deleted at [%tc]%n";
+            case "StudentRetrieved" -> "[%tc] [%s] [%s][%d] was retrieved%n";
+            case "StudentCreated" -> "[%tc] [%s] [%s][%d] was created%n";
+            case "StudentUpdated" -> "[%tc] [%s] [%s][%d] was updated%n";
+            case "StudentDeleted" -> "[%tc] [%s] [%s][%d] was deleted%n";
             default -> "Unknown Student Event";
         };
 
-        String formatted_log = String.format(log, key, std.getName(), std.getId(), date);
+        String formatted_log = String.format(log, date, key, std.getName(), std.getId());
 
         Logger.log(formatted_log);
     }

@@ -1,5 +1,6 @@
 package com.hiruna.logging.config;
 
+import com.hiruna.logging.models.Course;
 import com.hiruna.logging.models.Student;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -21,6 +22,7 @@ public class KafkaConsumerConfig {
     @Value("${spring.kafka.bootstrap-servers}")
     private String server_addr;
 
+    //consumer configuration for student events
     @Bean
     public ConsumerFactory<String, Student> consumerFactory(){
         Map<String, Object> config = new HashMap<>();
@@ -39,6 +41,28 @@ public class KafkaConsumerConfig {
     public ConcurrentKafkaListenerContainerFactory<String, Student> kafkaListenerContainerFactory(){
         ConcurrentKafkaListenerContainerFactory<String, Student> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        return factory;
+    }
+
+    //consumer configuration for course events
+    @Bean
+    public ConsumerFactory<String, Course> courseConsumerFactory(){
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, server_addr);
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+//        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, "course-event-group1");
+
+        JsonDeserializer<Course> courseDeserializer = new JsonDeserializer<>(Course.class, false);
+        courseDeserializer.addTrustedPackages("*");
+
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), courseDeserializer);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, Course> courseListenerFactory(){
+        ConcurrentKafkaListenerContainerFactory<String, Course> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(courseConsumerFactory());
         return factory;
     }
 }
