@@ -65,4 +65,22 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(courseConsumerFactory());
         return factory;
     }
+
+    @Bean
+    public ConsumerFactory<String, String> registrationConsumerFactory(){
+        Map<String, Object> config = new HashMap<>();
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, server_addr);
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, "registration-events-group1");
+
+        return new DefaultKafkaConsumerFactory<>(config);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String> registrationListenerFactory(){
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(registrationConsumerFactory());
+        return factory;
+    }
 }

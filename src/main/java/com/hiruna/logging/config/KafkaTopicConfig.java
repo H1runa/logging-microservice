@@ -32,4 +32,9 @@ public class KafkaTopicConfig {
     public NewTopic topic2(){
         return new NewTopic("course-events", 1, (short) 1);
     }
+
+    @Bean
+    public NewTopic topic3(){
+        return new NewTopic("registration-events", 1, (short) 1);
+    }
 }
